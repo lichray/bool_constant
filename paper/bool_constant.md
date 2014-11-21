@@ -5,6 +5,8 @@ pre code { display: block; margin-left: 2em; }
 div { display: block; margin-left: 2em; }
 ins { text-decoration: none; font-weight: bold; background-color: #A0FFA0 }
 del { text-decoration: line-through; background-color: #FFA0A0 }
+table.std { border: 1pt solid black; border-collapse: collapse; width: 70%; }
+table.std td { border-bottom: 1pt solid black; vertical-align: text-top; }
 </style>
 
 <table><tbody>
@@ -73,8 +75,115 @@ Modify 20.10.3 &#91;meta.help&#93;:
 > and `false_type` are used as base classes to define the
 > interface for various type traits.
 
-Replace all occurrences of "`integral_constant<bool, `"
-with "`bool_constant`" in 20.11.5 &#91;ratio.comparison&#93;.
+Modify Table 49 in 20.10.4.3 &#91;meta.unary.prop&#93;:
+
+<div>
+<table class="std"><tbody>
+<tr>
+<td style="width: 40%">
+<tt>
+template &lt;class T&gt;<br/>
+struct is_signed;<br/>
+</tt>
+</td>
+<td style="width: 30%">
+If <tt>is_arithmetic&lt;T&gt;::value</tt> is <tt>true</tt>, the same result as
+<del><tt>integral_constant&lt;bool, T(-1) &lt; T(0)&gt;::value</tt></del>
+<ins><tt>bool_constant&lt;T(-1) &lt; T(0)&gt;::value</tt></ins>
+; otherwise, <tt>false</tt>
+</td>
+<td>
+</td>
+</tr>
+<tr>
+<td style="width: 40%">
+<tt>
+template &lt;class T&gt;<br/>
+struct is_unsigned;<br/>
+</tt>
+</td>
+<td style="width: 30%">
+If <tt>is_arithmetic&lt;T&gt;::value</tt> is <tt>true</tt>, the same result as
+<del><tt>integral_constant&lt;bool, T(0) &lt; T(-1)&gt;::value</tt></del>
+<ins><tt>bool_constant&lt;T(0) &lt; T(-1)&gt;::value</tt></ins>
+; otherwise, <tt>false</tt>
+</td>
+<td>
+</td>
+</tr>
+</tbody></table>
+</div>
+
+Modify 20.11.5 &#91;ratio.comparison&#93;:
+
+    template <class R1, class R2> struct ratio_equal
+<div>
+<del><tt>
+      : integral_constant&lt;bool, <i>see below</i>&gt; { };<br/>
+</tt></del>
+<ins><tt>
+      : bool_constant&lt;<i>see below</i>&gt; { };<br/>
+</tt></ins>
+</div>
+
+> If `R1::num == R2::num` and `R1::den == R2::den`, `ratio_equal<R1, R2>`
+> shall be derived from
+> <del><tt>integral_constant&lt;bool, true&gt;</tt></del>
+> <ins><tt>bool_constant&lt;true&gt;</tt></ins>
+> ; otherwise it shall be derived from
+> <del><tt>integral_constant&lt;bool, false&gt;</tt></del>
+> <ins><tt>bool_constant&lt;false&gt;</tt></ins>
+> .
+
+    template <class R1, class R2> struct ratio_not_equal
+<div>
+<del><tt>
+      : integral_constant&lt;bool,
+      !ratio_equal&lt;R1, R2&gt;::value&gt; { };<br/>
+</tt></del>
+<ins><tt>
+      : bool_constant&lt;!ratio_equal&lt;R1, R2&gt;::value&gt; { };<br/>
+</tt></ins>
+</div>
+
+    template <class R1, class R2> struct ratio_less
+<div>
+<del><tt>
+      : integral_constant&lt;bool, <i>see below</i>&gt; { };<br/>
+</tt></del>
+<ins><tt>
+      : bool_constant&lt;<i>see below</i>&gt; { };<br/>
+</tt></ins>
+</div>
+
+> If `R1::num * R2::den < R2::num * R1::den`, `ratio_less<R1, R2>` shall be
+> derived from
+> <del><tt>integral_constant&lt;bool, true&gt;</tt></del>
+> <ins><tt>bool_constant&lt;true&gt;</tt></ins>
+> ; otherwise it shall be derived from
+> <del><tt>integral_constant&lt;bool, false&gt;</tt></del>
+> <ins><tt>bool_constant&lt;false&gt;</tt></ins>
+> . Implementations may use other algorithms to compute this relationship to
+> avoid overflow. If overflow occurs, the program is ill-formed.
+
+<div>
+<del><tt>
+  template &lt;class R1, class R2&gt; struct ratio_less_equal<br/>
+    : integral_constant&lt;bool, !ratio_less&lt;R2, R1&gt;::value&gt; { };<br/>
+  template &lt;class R1, class R2&gt; struct ratio_greater<br/>
+    : integral_constant&lt;bool, ratio_less&lt;R2, R1&gt;::value&gt; { };<br/>
+  template &lt;class R1, class R2&gt; struct ratio_greater_equal<br/>
+    : integral_constant&lt;bool, !ratio_less&lt;R1, R2&gt;::value&gt; { };<br/>
+</tt></del>
+<ins><tt>
+  template &lt;class R1, class R2&gt; struct ratio_less_equal<br/>
+    : bool_constant&lt;!ratio_less&lt;R2, R1&gt;::value&gt; { };<br/>
+  template &lt;class R1, class R2&gt; struct ratio_greater<br/>
+    : bool_constant&lt;ratio_less&lt;R2, R1&gt;::value&gt; { };<br/>
+  template &lt;class R1, class R2&gt; struct ratio_greater_equal<br/>
+    : bool_constant&lt;!ratio_less&lt;R1, R2&gt;::value&gt; { };<br/>
+</tt></ins>
+</div>
 
 ## Acknowledgments
 
