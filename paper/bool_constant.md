@@ -75,3 +75,7 @@ Modify 20.10.3 &#91;meta.help&#93;:
 
 Replace all occurrences of "`integral_constant<bool, `"
 with "`bool_constant`" in 20.11.5 &#91;ratio.comparison&#93;.
+
+## Acknowledgments
+
+Thanks Tony Van Eerd for bringing this to the reflector.
