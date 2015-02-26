@@ -3,7 +3,7 @@
 <style type="text/css">
 pre code { display: block; margin-left: 2em; }
 div { display: block; margin-left: 2em; }
-ins { text-decoration: none; font-weight: bold; background-color: #A0FFA0 }
+ins { text-decoration: underline; background-color: #A0FFA0 }
 del { text-decoration: line-through; background-color: #FFA0A0 }
 table.std { border: 1pt solid black; border-collapse: collapse; width: 70%; }
 table.std td { border-bottom: 1pt solid black; vertical-align: text-top; }
@@ -11,16 +11,21 @@ table.std td { border-bottom: 1pt solid black; vertical-align: text-top; }
 
 <table><tbody>
 <tr><th>Doc. no.:</th>	<td>Nnnnn</td></tr>
-<tr><th>Date:</th>	<td>2014-11-21</td></tr>
+<tr><th>Date:</th>	<td>2015-02-23</td></tr>
 <tr><th>Project:</th>	<td>Programming Language C++, Library Working Group</td></tr>
+<tr><th>Revises:</th>	<td>N4334</td></tr>
 <tr><th>Reply-to:</th>	<td>Zhihao Yuan &lt;zy at miator dot net&gt;</td></tr>
 </tbody></table>
 
-# Wording for bool_constant
+# Wording for bool_constant, revision 1
 
 Rationale see <https://issues.isocpp.org/show_bug.cgi?id=51>.
 
-This wording is relative to N4140.
+This paper consolidates
+[N4334](http://www.open-std.org/JTC1/SC22/WG21/docs/papers/2014/n4334.html)
+with LWG's wording improvements to `<ratio>`.
+
+This wording is relative to N4296.
 
 Modify 20.10.2 &#91;meta.type.synop&#93;:
 
@@ -53,19 +58,10 @@ Modify 20.10.3 &#91;meta.help&#93;:
 
       };
 <div>
-<ins><tt>
-      template &lt;bool B&gt;<br/>
-      using bool_constant = integral_constant&lt;bool, B&gt;;<br/>
-      &nbsp;<br/>
-</tt></ins>
 <del><tt>
       typedef integral_constant&lt;bool, true&gt; true_type;<br/>
       typedef integral_constant&lt;bool, false&gt; false_type;<br/>
 </tt></del>
-<ins><tt>
-      typedef bool_constant&lt;true&gt; true_type;<br/>
-      typedef bool_constant&lt;false&gt; false_type;<br/>
-</tt></ins>
 </div>
 
     }
@@ -122,18 +118,20 @@ Modify 20.11.5 &#91;ratio.comparison&#93;:
       : integral_constant&lt;bool, <i>see below</i>&gt; { };<br/>
 </tt></del>
 <ins><tt>
-      : bool_constant&lt;<i>see below</i>&gt; { };<br/>
+      : bool_constant&lt;R1::num == R2::num &amp;&amp;
+R1::den == R2::den&gt; { };<br/>
 </tt></ins>
 </div>
 
-> If `R1::num == R2::num` and `R1::den == R2::den`, `ratio_equal<R1, R2>`
+> <del>
+> If <tt>R1::num == R2::num</tt> and <tt>R1::den == R2::den</tt>,
+> <tt>ratio_equal&lt;R1, R2&gt;</tt>
 > shall be derived from
-> <del><tt>integral_constant&lt;bool, true&gt;</tt></del>
-> <ins><tt>bool_constant&lt;true&gt;</tt></ins>
+> <tt>integral_constant&lt;bool, true&gt;</tt>
 > ; otherwise it shall be derived from
-> <del><tt>integral_constant&lt;bool, false&gt;</tt></del>
-> <ins><tt>bool_constant&lt;false&gt;</tt></ins>
+> <tt>integral_constant&lt;bool, false&gt;</tt>
 > .
+> </del>
 
     template <class R1, class R2> struct ratio_not_equal
 <div>
@@ -156,7 +154,11 @@ Modify 20.11.5 &#91;ratio.comparison&#93;:
 </tt></ins>
 </div>
 
-> If `R1::num * R2::den < R2::num * R1::den`, `ratio_less<R1, R2>` shall be
+> If
+> <del><tt>R1::num * R2::den &lt; R2::num * R1::den</tt></del>
+> <ins><tt>R1::num</tt> &times; <tt>R2::den</tt> is less than
+> <tt>R2::num</tt> &times; <tt>R1::den</tt></ins>
+> , `ratio_less<R1, R2>` shall be
 > derived from
 > <del><tt>integral_constant&lt;bool, true&gt;</tt></del>
 > <ins><tt>bool_constant&lt;true&gt;</tt></ins>
